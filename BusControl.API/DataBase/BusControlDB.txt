@@ -1,0 +1,309 @@
+CREATE DATABASE BusControlDB;
+
+CREATE TABLE Buses (
+  Id int IDENTITY(1,1) NOT NULL,
+  Number varchar(255) NOT NULL,
+  Plate varchar(255) NOT NULL,
+  Line varchar(255) NOT NULL,
+  Routes varchar(max) NOT NULL,  
+);
+
+CREATE TABLE Routes (
+    Id int IDENTITY(1,1) NOT NULL,
+    Name varchar(255) NOT NULL,
+    Origin varchar(255) NOT NULL,
+    Destination varchar(255) NOT NULL
+);
+
+CREATE TABLE Trips (
+  Id int IDENTITY(1,1) NOT NULL,
+  BusId int NOT NULL,
+  DepartureTime datetime NOT NULL,
+  ArrivalTime datetime NOT NULL,
+  Duration int NOT NULL,
+  LimitPassengers int NOT NULL,
+  Passengers varchar(max) NULL,
+  DriverId varchar(255) NOT NULL
+);
+
+CREATE TABLE Passengers (
+  Id int IDENTITY(1,1) NOT NULL,
+  Name varchar(255) NOT NULL,
+  Cpf varchar(255) NOT NULL,
+  Email varchar(255) NOT NULL,
+  Phone varchar(255) NOT NULL,
+);
+
+CREATE TABLE Drivers (
+    Id int IDENTITY(1,1) NOT NULL,
+    Login varchar(255) NOT NULL,
+    Name varchar(255) NOT NULL,
+    Cpf varchar(255) NOT NULL,
+    Email varchar(255) NOT NULL,  
+);
+
+CREATE TABLE TripsPassengers (
+    TripId int NOT NULL,
+    PassengerId int NOT NULL,
+);
+
+ALTER TABLE Buses
+ADD CONSTRAINT PK_Buses PRIMARY KEY (Id);
+ALTER TABLE Routes
+ADD CONSTRAINT PK_Routes PRIMARY KEY (Id);
+ALTER TABLE Trips
+ADD CONSTRAINT PK_Trips PRIMARY KEY (Id);
+ALTER TABLE Trips
+ADD CONSTRAINT FK_Trips_Buses FOREIGN KEY (BusId) REFERENCES Buses (Id);
+ALTER TABLE Trips
+ADD CONSTRAINT CHECK_LimitPassengers CHECK (LimitPassengers > 0);
+ALTER TABLE Passengers
+ADD CONSTRAINT PK_Passengers PRIMARY KEY (Id);
+ALTER TABLE Drivers
+ADD CONSTRAINT PK_Drivers PRIMARY KEY (Id);
+ALTER TABLE TripsPassengers
+ADD CONSTRAINT PK_TripsPassengers PRIMARY KEY (TripId, PassengerId);
+ALTER TABLE TripsPassengers
+ADD CONSTRAINT FK_TripsPassengers_Trips FOREIGN KEY (TripId) REFERENCES Trips (Id);
+ALTER TABLE TripsPassengers
+ADD CONSTRAINT FK_TripsPassengers_Passengers FOREIGN KEY (PassengerId) REFERENCES Passengers (Id);
+
+-- Trigger para garantir que apenas um ônibus esteja associado a uma viagem
+
+CREATE TRIGGER tgr_Trips_BusId
+ON Trips
+AFTER INSERT
+AS
+BEGIN
+  IF EXISTS (
+    SELECT 1
+    FROM Trips
+    WHERE BusId IN (SELECT BusId FROM inserted)
+    GROUP BY BusId
+    HAVING COUNT(*) > 1
+  )
+  BEGIN
+    RAISERROR('Apenas um ônibus pode estar associado a uma viagem.', 16, 1);
+    ROLLBACK TRANSACTION;
+  END
+END;
+
+
+-- Trigger para garantir que a data e hora de partida de uma viagem não sejam anteriores à data e hora atual
+CREATE TRIGGER tgr_Trips_DepartureTime
+ON Trips
+AFTER INSERT
+AS
+BEGIN
+  DECLARE @departureTime datetime;
+
+  SELECT @departureTime = DepartureTime FROM inserted;
+
+  IF @departureTime < GETDATE()
+  BEGIN
+    RAISERROR('A data e hora de partida de uma viagem não podem ser anteriores à data e hora atual.', 16, 1);
+  END
+END;
+
+-- Trigger para garantir que a duração de uma viagem não seja inferior a 1 hora
+CREATE TRIGGER tgr_Trips_Duration
+ON Trips
+AFTER INSERT
+AS
+BEGIN
+  DECLARE @duration int;
+
+  SELECT @duration = Duration FROM inserted;
+
+  IF @duration < 1
+  BEGIN
+    RAISERROR('A duração de uma viagem não pode ser inferior a 1 hora.', 16, 1);
+  END
+END;
+
+ALTER TABLE TripsPassengers
+ADD FOREIGN KEY (TripId) REFERENCES Trips(Id),
+    FOREIGN KEY (PassengerId) REFERENCES Passengers(Id);
+
+ALTER TABLE Trips
+ALTER COLUMN DriverId int;
+
+ALTER TABLE Trips
+ADD FOREIGN KEY (DriverId) REFERENCES Drivers(Id);
+
+ALTER TABLE Trips
+ADD FOREIGN KEY (BusId) REFERENCES Buses(Id),
+    FOREIGN KEY (DriverId) REFERENCES Drivers(Id);
+
+-- Adicionando chave estrangeira para BusId na tabela Trips
+ALTER TABLE Trips
+ADD FOREIGN KEY (BusId) REFERENCES Buses(Id);
+
+-- Adicionando chave estrangeira para DriverId na tabela Trips
+ALTER TABLE Trips
+ADD FOREIGN KEY (DriverId) REFERENCES Drivers(Id);
+
+-- Adicionando chaves estrangeiras para TripId e PassengerId na tabela TripsPassengers
+ALTER TABLE TripsPassengers
+ADD FOREIGN KEY (TripId) REFERENCES Trips(Id),
+    FOREIGN KEY (PassengerId) REFERENCES Passengers(Id);
+
+
+ -- Tabela Bus:
+INSERT INTO Buses (Number, Plate, Line, Routes)
+VALUES ('1001', 'ABC-1234', 'Linha 100', '1,2,3');
+
+INSERT INTO Buses (Number, Plate, Line, Routes)
+VALUES ('1002', 'DEF-5678', 'Linha 200', '4,5,6');
+
+INSERT INTO Buses (Number, Plate, Line, Routes)
+VALUES ('1003', 'GHI-9012', 'Linha 300', '7,8,9');
+
+
+-- Tabela Route:
+INSERT INTO Routes (Name, Origin, Destination)
+VALUES ('Rota 1', 'Barra da Tijuca', 'Centro do Rio');
+
+INSERT INTO Routes (Name, Origin, Destination)
+VALUES ('Rota 2', 'Ilha do Governador', 'Barra da Tijuca');
+
+INSERT INTO Routes (Name, Origin, Destination)
+VALUES ('Rota 3', 'Copacabana', 'Ipanema');
+
+
+-- Tabela Passenger:
+INSERT INTO Passengers (Name, Cpf, Email, Phone)
+VALUES ('João da Silva', '12345678900', 'joao@email.com', '(21) 98765-4321');
+
+INSERT INTO Passengers (Name, Cpf, Email, Phone)
+VALUES ('Maria Santos', '98765432100', 'maria@email.com', '(21) 12345-6789');
+
+INSERT INTO Passengers (Name, Cpf, Email, Phone)
+VALUES ('Pedro Oliveira', '09876543210', 'pedro@email.com', '(21) 55555-5555');
+
+
+-- Tabela Driver:
+INSERT INTO Drivers (Login, Name, Cpf, Email)
+VALUES ('jose', 'José da Silva', '11111111111', 'jose@email.com');
+
+INSERT INTO Drivers (Login, Name, Cpf, Email)
+VALUES ('ana', 'Ana Maria', '22222222222', 'ana@email.com');
+
+INSERT INTO Drivers (Login, Name, Cpf, Email)
+VALUES ('carlos', 'Carlos Alberto', '33333333333', 'carlos@email.com');
+
+
+
+-- Tabela TripsPassengers:
+
+-- Supondo que os IDs reais na tabela Trips são 10, 11, 12, 15, 16, 17
+
+-- Inserir passageiros para a viagem com ID 10
+INSERT INTO TripsPassengers (TripId, PassengerId) VALUES (10, 1);
+INSERT INTO TripsPassengers (TripId, PassengerId) VALUES (10, 2);
+
+-- Inserir passageiros para a viagem com ID 11
+INSERT INTO TripsPassengers (TripId, PassengerId) VALUES (11, 1);
+INSERT INTO TripsPassengers (TripId, PassengerId) VALUES (11, 3);
+
+-- Inserir passageiros para a viagem com ID 12
+INSERT INTO TripsPassengers (TripId, PassengerId) VALUES (12, 2);
+
+-- Inserir passageiros para a viagem com ID 15
+INSERT INTO TripsPassengers (TripId, PassengerId) VALUES (15, 1);
+INSERT INTO TripsPassengers (TripId, PassengerId) VALUES (15, 2);
+INSERT INTO TripsPassengers (TripId, PassengerId) VALUES (15, 3);
+
+-- Inserir passageiros para a viagem com ID 16
+INSERT INTO TripsPassengers (TripId, PassengerId) VALUES (16, 1);
+
+-- Inserir passageiros para a viagem com ID 17
+INSERT INTO TripsPassengers (TripId, PassengerId) VALUES (17, 2);
+
+-- Desativar triggers temporariamente
+DISABLE TRIGGER tgr_Trips_BusId ON Trips;
+DISABLE TRIGGER tgr_Trips_DepartureTime ON Trips;
+DISABLE TRIGGER tgr_Trips_Duration ON Trips;
+
+-- Desativar todas as triggers
+DESABLE TRIGGER ALL ON Trips;
+
+-- Tabela Trip:
+INSERT INTO Trips (BusId, DepartureTime, ArrivalTime, Duration, LimitPassengers, Passengers, DriverId)
+VALUES (1, '2024-01-21T08:00:00', '2024-01-21T09:00:00', 60, 40, NULL, '1');
+
+INSERT INTO Trips (BusId, DepartureTime, ArrivalTime, Duration, LimitPassengers, Passengers, DriverId)
+VALUES (2, '2024-01-21T10:00:00', '2024-01-21T11:00:00', 60, 50, NULL, '2');
+
+INSERT INTO Trips (BusId, DepartureTime, ArrivalTime, Duration, LimitPassengers, Passengers, DriverId)
+VALUES (3, '2024-01-21T12:00:00', '2024-01-21T13:00:00', 60, 30, NULL, '3');
+
+-- Ativar triggers um a um
+ENABLE TRIGGER tgr_Trips_BusId ON Trips;
+ENABLE TRIGGER tgr_Trips_DepartureTime ON Trips;
+ENABLE TRIGGER tgr_Trips_Duration ON Trips;
+
+-- Ativar todas as triggers
+ENABLE TRIGGER ALL ON Trips;
+
+-- Para verificar se as trigegrs estão desativadas
+SELECT name, is_disabled
+FROM sys.triggers
+WHERE parent_id = OBJECT_ID('Trips');
+
+
+
+Aqui está uma explicação das consultas:
+
+1. Criação do banco de dados e das tabelas:
+
+CREATE DATABASE BusControlDB; : Cria um novo banco de dados chamado "BusControlDB" para armazenar dados relacionados a ônibus.
+CREATE TABLE Buses, Routes, Trips, Passengers, Drivers, TripsPassengers; : Essas declarações criam seis tabelas no banco de dados para armazenar informações sobre ônibus, rotas, viagens, passageiros, motoristas e as relações entre viagens e passageiros.
+2. Chaves primárias e restrições:
+
+ALTER TABLE ... ADD CONSTRAINT PK_... PRIMARY KEY (Id); : Essas adicionam chaves primárias às tabelas, garantindo que cada registro tenha um identificador exclusivo.
+ALTER TABLE Trips ADD CONSTRAINT CHECK_LimitPassengers CHECK (LimitPassengers > 0); : Isso impõe uma regra de que o número de passageiros de uma viagem deve ser maior que zero.
+
+3. Chaves estrangeiras:
+ALTER TABLE Trips ADD CONSTRAINT FK_Trips_Buses FOREIGN KEY (BusId) REFERENCES Buses (Id); : Esta estabelece uma relação entre as tabelas "Trips" e "Buses", garantindo que cada viagem esteja associada a um ônibus válido.
+ALTER TABLE TripsPassengers ADD CONSTRAINT FK_TripsPassengers_Trips FOREIGN KEY (TripId) REFERENCES Trips (Id), CONSTRAINT FK_TripsPassengers_Passengers FOREIGN KEY (PassengerId) REFERENCES Passengers (Id); : Essas criam relações entre a tabela "TripsPassengers" e as tabelas "Trips" e "Passengers", vinculando as informações dos passageiros a viagens específicas.
+4. Gatilhos:
+
+CREATE TRIGGER tgr_Trips_BusId, tgr_Trips_DepartureTime, tgr_Trips_Duration; : Essas criam gatilhos que são executados automaticamente quando certas ações ocorrem na tabela "Trips":
+tgr_Trips_BusId: Impede que um ônibus seja associado a mais de uma viagem ao mesmo tempo.
+tgr_Trips_DepartureTime: Garante que a hora de partida de uma viagem não seja no passado.
+tgr_Trips_Duration: Impõe uma duração mínima de viagem de 1 hora.
+5. Chaves estrangeiras adicionais:
+
+ALTER TABLE Trips ADD FOREIGN KEY (DriverId) REFERENCES Drivers (Id); : Isso vincula cada viagem a um motorista específico.
+ALTER TABLE TripsPassengers ADD FOREIGN KEY (TripId) REFERENCES Trips(Id), FOREIGN KEY (PassengerId) REFERENCES Passengers(Id); : Essas reforçam as relações entre viagens, passageiros e seus dados associados.
+Em resumo, essas consultas criam uma estrutura de banco de dados para gerenciar viagens de ônibus, passageiros, motoristas e rotas, enquanto garantem a integridade dos dados por meio de restrições e gatilhos.
+
+Explicação mais detalhada:
+
+1. Criação do banco de dados e das tabelas
+A primeira consulta cria um novo banco de dados chamado "BusControlDB". As seis consultas seguintes criam seis tabelas no banco de dados:
+Buses: Armazena informações sobre ônibus, como o número do ônibus, a placa, a linha e as rotas.
+Routes: Armazena informações sobre rotas, como o nome, o ponto de partida e o destino.
+Trips: Armazena informações sobre viagens, como a data e hora de partida, a data e hora de chegada, a duração, o número limite de passageiros e os passageiros.
+Passengers: Armazena informações sobre passageiros, como o nome, o CPF, o e-mail e o telefone.
+Drivers: Armazena informações sobre motoristas, como o login, o nome, o CPF e o e-mail.
+TripsPassengers: Armazena informações sobre a associação entre viagens e passageiros, como o ID da viagem e o ID do passageiro.
+
+2. Chaves primárias e restrições
+As chaves primárias são usadas para identificar de forma exclusiva cada registro em uma tabela. As restrições são usadas para impor regras sobre os dados que podem ser armazenados nas tabelas.
+As consultas que adicionam chaves primárias às tabelas garantem que cada registro tenha um identificador exclusivo. A consulta que adiciona a restrição CHECK_LimitPassengers garante que o número de passageiros de uma viagem seja maior que zero.
+
+3. Chaves estrangeiras
+As chaves estrangeiras são usadas para estabelecer uma relação entre duas tabelas. A chave estrangeira refere-se a uma coluna ou conjunto de colunas em outra tabela.
+As consultas que adicionam chaves estrangeiras às tabelas garantem que os dados nas tabelas estejam relacionados de forma consistente. Por exemplo, a consulta que adiciona a chave estrangeira FK_Trips_Buses garante que cada viagem esteja associada a um ônibus válido.
+
+4. Gatilhos
+Os gatilhos são usados para executar código automaticamente quando ocorrem certas ações em uma tabela.
+As consultas que criam gatilhos garantem que os dados nas tabelas sejam precisos e consistentes. Por exemplo, o gatilho tgr_Trips_BusId garante que um ônibus não possa ser associado a mais de uma viagem ao mesmo tempo.
+
+5. Chaves estrangeiras adicionais
+As consultas que adicionam chaves estrangeiras adicionais reforçam as relações entre viagens, passageiros e seus dados associados. Por exemplo, a consulta que adiciona a chave estrangeira FK_TripsPassengers_Trips garante que os passageiros sejam associados a viagens válidas.
+
+Conclusão
+As consultas acima criam uma estrutura de banco de dados sólida para gerenciar viagens de ônibus, passageiros, motoristas e rotas. As chaves primárias, restrições, chaves estrangeiras e gatilhos garantem que os dados sejam precisos, consistentes e seguros.
