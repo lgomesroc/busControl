@@ -11,13 +11,11 @@ namespace BusControl.API.Triggers
         {
             if (entity is Trip trip)
             {
-                // Lógica específica para a trigger de data e hora de partida
                 if (trip.DepartureTime < DateTime.Now)
                 {
                     throw new InvalidOperationException("A data e hora de partida de uma viagem não podem ser anteriores à data e hora atual.");
                 }
 
-                // Adicione sua lógica personalizada aqui...
             }
         }
 

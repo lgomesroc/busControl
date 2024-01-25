@@ -80,6 +80,10 @@ namespace BusControl.API.DataBase.SqlConnection
             Origin = origin;
             Destination = destination;
         }
+
+        public Bus(int id, string name, string origin, string destination, string v) : this(id, name, origin, destination)
+        {
+        }
     }
     public class Driver
     {
@@ -97,6 +101,10 @@ namespace BusControl.API.DataBase.SqlConnection
             Name = name;
             Cpf = cpf;
             Email = email;
+        }
+
+        public Driver(char v1, char v2, char v3, char v4)
+        {
         }
     }
 
@@ -125,6 +133,10 @@ namespace BusControl.API.DataBase.SqlConnection
             DriverId = driverId;
             Bus = bus;
             Driver = driver;
+        }
+
+        public Trip(int v1, int v2, DateTime dateTime1, DateTime dateTime2, int v3, int v4, object value, string v5)
+        {
         }
     }
 

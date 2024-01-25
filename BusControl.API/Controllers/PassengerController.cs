@@ -30,7 +30,7 @@ namespace BusControl.API.Controllers
 
             if (passenger == null)
             {
-                return NotFound(); // Retorna 404 se o passageiro não for encontrado
+                return NotFound();
             }
 
             return Ok(passenger);
@@ -50,7 +50,7 @@ namespace BusControl.API.Controllers
 
             if (existingPassenger == null)
             {
-                return NotFound(); // Retorna 404 se o passageiro não for encontrado
+                return NotFound();
             }
 
             _passengerRepository.UpdatePassenger(id, passenger);
@@ -64,7 +64,7 @@ namespace BusControl.API.Controllers
 
             if (existingPassenger == null)
             {
-                return NotFound(); // Retorna 404 se o passageiro não for encontrado
+                return NotFound();
             }
 
             _passengerRepository.DeletePassenger(id);

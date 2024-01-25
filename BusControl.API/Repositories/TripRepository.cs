@@ -13,17 +13,11 @@ namespace BusControl.API.Repositories
             _context = context;
         }
 
+        public TripRepository()
+        {
+        }
+
         public IQueryable<TripModel> GetTrips()
-        {
-            throw new NotImplementedException();
-        }
-
-        public void CreateRoute(TripModel trip)
-        {
-            throw new NotImplementedException();
-        }
-
-        public void DeleteTrip(int id)
         {
             throw new NotImplementedException();
         }
@@ -33,36 +27,35 @@ namespace BusControl.API.Repositories
             throw new NotImplementedException();
         }
 
-        public IQueryable<TripModel> GetTripsForId(int id)
+        public void CreateTrip(TripModel trip)
         {
             throw new NotImplementedException();
         }
 
-        IQueryable<TripModel> ITripRepository.GetTrips()
+        public void UpdateTrip(int id, TripModel trip)
         {
             throw new NotImplementedException();
         }
 
-        TripModel ITripRepository.GetTripById(int id)
+        public void DeleteTrip(int id)
         {
             throw new NotImplementedException();
         }
 
-        void ITripRepository.CreateRoute(TripModel trip)
+        public void CreateRoute(TripModel trip)
         {
             throw new NotImplementedException();
         }
 
-        void ITripRepository.UpdateTrip(int id, TripModel trip)
+        void ITripRepository.UpdateTrip(int id, Trip trip)
         {
             throw new NotImplementedException();
         }
 
-        void ITripRepository.DeleteTrip(int id)
+        void ITripRepository.CreateTrip(Trip trip)
         {
             throw new NotImplementedException();
         }
-
-        public IQueryable<TripModel> GetTr;
     }
 }
+

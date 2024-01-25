@@ -27,7 +27,7 @@ namespace BusControl.API.Controllers
             var bus = _busRepository.GetBusById(id);
             if (bus == null)
             {
-                return NotFound(); // Retorna 404 se o ônibus não for encontrado
+                return NotFound();
             }
 
             return Ok(bus);
@@ -49,13 +49,13 @@ namespace BusControl.API.Controllers
 
             if (existingBus == null)
             {
-                return NotFound(); // Retorna 404 se o ônibus não for encontrado
+                return NotFound();
             }
 
             _busRepository.UpdateBus(bus);
             _busRepository.SaveChanges();
 
-            return NoContent(); // Retorna 204 indicando sucesso sem conteúdo adicional
+            return NoContent();
         }
 
         [HttpDelete("/buses/{id:int}")]

@@ -30,7 +30,6 @@ namespace BusControl.API.Controllers
         [HttpPost("/trips/{tripId}/passengers")]
         public ActionResult<TripPassengerModel> AddPassengerToTrip(int tripId, [FromBody] TripPassengerModel tripPassenger)
         {
-            // Implemente a lógica necessária para adicionar um passageiro a uma viagem
             _tripPassengerRepository.CreateTripPassenger(tripPassenger);
             return Ok(tripPassenger);
         }
@@ -38,7 +37,6 @@ namespace BusControl.API.Controllers
         [HttpDelete("/trips/{tripId}/passengers/{passengerId}")]
         public ActionResult RemovePassengerFromTrip(int tripId, int passengerId)
         {
-            // Implemente a lógica necessária para remover um passageiro de uma viagem
             _tripPassengerRepository.DeleteTripPassenger(tripId, passengerId);
             return Ok();
         }

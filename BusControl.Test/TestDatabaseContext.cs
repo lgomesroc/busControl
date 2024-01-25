@@ -11,7 +11,6 @@ namespace BuscControl.Test
         {
         }
 
-        // Defina as DbSet correspondentes às suas tabelas de banco de dados aqui
         public DbSet<Bus> Buses { get; set; }
         public DbSet<Route> Routes { get; set; }
         public DbSet<Trip> Trips { get; set; }

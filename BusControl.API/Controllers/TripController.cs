@@ -36,12 +36,15 @@ namespace BusControl.API.Controllers
             return Ok(trip);
         }
 
+
         [HttpPost]
         public ActionResult<Trip> CreateTrip(Trip trip)
         {
-            _tripRepository.CreateRoute(tripModel);
+            _tripRepository.CreateTrip(trip); //
             return Ok(trip);
         }
+
+
 
         [HttpPut("{id}")]
         public ActionResult<Trip> UpdateTrip(int id, Trip trip)
@@ -52,9 +55,11 @@ namespace BusControl.API.Controllers
                 return NotFound();
             }
 
-            _tripRepository.UpdateTrip(id, tripModel);
+            _tripRepository.UpdateTrip(id, trip);
             return Ok(trip);
         }
+
+
 
         [HttpDelete("{id}")]
         public ActionResult DeleteTrip(int id)

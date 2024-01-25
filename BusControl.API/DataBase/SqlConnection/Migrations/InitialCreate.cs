@@ -6,7 +6,6 @@ namespace BusControl.API.DataBase.SqlConnection.Migrations
     {
         protected override void Up(MigrationBuilder migrationBuilder)
         {
-            // Cria a tabela "Routes"
             migrationBuilder.CreateTable(
                 name: "Routes",
                 columns: table => new
