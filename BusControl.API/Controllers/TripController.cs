@@ -1,7 +1,8 @@
 ﻿using BusControl.API.DataBase.SqlConnection;
 using BusControl.API.Interfaces.Repositories;
-using BusControl.API.Models;
 using Microsoft.AspNetCore.Mvc;
+using Swashbuckle.AspNetCore.Annotations;
+using System.Collections.Generic;
 
 namespace BusControl.API.Controllers
 {
@@ -10,7 +11,6 @@ namespace BusControl.API.Controllers
     public class TripController : ControllerBase
     {
         private readonly ITripRepository _tripRepository;
-        private TripModel tripModel;
 
         public TripController(ITripRepository tripRepository)
         {
@@ -18,6 +18,8 @@ namespace BusControl.API.Controllers
         }
 
         [HttpGet]
+        [SwaggerOperation(Summary = "Get all trips", Description = "Get a list of all trips.")]
+        [SwaggerResponse(StatusCodes.Status200OK, "Successful operation", typeof(IEnumerable<Trip>))]
         public ActionResult<IEnumerable<Trip>> GetTrips()
         {
             var trips = _tripRepository.GetTrips();
@@ -25,6 +27,9 @@ namespace BusControl.API.Controllers
         }
 
         [HttpGet("{id}")]
+        [SwaggerOperation(Summary = "Get trip by ID", Description = "Get information about a specific trip.")]
+        [SwaggerResponse(StatusCodes.Status200OK, "Successful operation", typeof(Trip))]
+        [SwaggerResponse(StatusCodes.Status404NotFound, "Trip not found")]
         public ActionResult<Trip> GetTripById(int id)
         {
             var trip = _tripRepository.GetTripById(id);
@@ -36,18 +41,22 @@ namespace BusControl.API.Controllers
             return Ok(trip);
         }
 
-
         [HttpPost]
-        public ActionResult<Trip> CreateTrip(Trip trip)
+        [SwaggerOperation(Summary = "Create a new trip", Description = "Add a new trip to the system.")]
+        [SwaggerResponse(StatusCodes.Status201Created, "Trip created", typeof(Trip))]
+        [SwaggerResponse(StatusCodes.Status400BadRequest, "Invalid input")]
+        public ActionResult<Trip> CreateTrip([FromBody] Trip trip)
         {
-            _tripRepository.CreateTrip(trip); //
+            _tripRepository.CreateTrip(trip);
             return Ok(trip);
         }
 
-
-
         [HttpPut("{id}")]
-        public ActionResult<Trip> UpdateTrip(int id, Trip trip)
+        [SwaggerOperation(Summary = "Update a trip", Description = "Update information about a specific trip.")]
+        [SwaggerResponse(StatusCodes.Status200OK, "Trip updated", typeof(Trip))]
+        [SwaggerResponse(StatusCodes.Status400BadRequest, "Invalid input")]
+        [SwaggerResponse(StatusCodes.Status404NotFound, "Trip not found")]
+        public ActionResult<Trip> UpdateTrip(int id, [FromBody] Trip trip)
         {
             var existingTrip = _tripRepository.GetTripById(id);
             if (existingTrip == null)
@@ -59,9 +68,10 @@ namespace BusControl.API.Controllers
             return Ok(trip);
         }
 
-
-
         [HttpDelete("{id}")]
+        [SwaggerOperation(Summary = "Delete a trip", Description = "Delete a specific trip from the system.")]
+        [SwaggerResponse(StatusCodes.Status200OK, "Trip deleted")]
+        [SwaggerResponse(StatusCodes.Status404NotFound, "Trip not found")]
         public ActionResult DeleteTrip(int id)
         {
             var existingTrip = _tripRepository.GetTripById(id);

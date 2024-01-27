@@ -1,0 +1,164 @@
+{
+  {
+    "openapi": "3.0.1",
+    "info": {
+      "title": "BusControl.API",
+      "version": "v1"
+    },
+    "paths": {
+      "/buses": {
+        "get": {
+          "summary": "Get all buses",
+          "responses": {
+            "200": {
+              "description": "Successful operation",
+              "content": {
+                "application/json": {
+                  "example": [
+                    {
+                      "id": 1,
+                      "name": "Bus 1"
+                    },
+                    {
+                      "id": 2,
+                      "name": "Bus 2"
+                    }
+                  ]
+                }
+              }
+            }
+          }
+        }
+        // Adicione aqui outras ações da BusController, se houver
+      },
+      "/drivers": {
+        "get": {
+          "summary": "Get all drivers",
+          "responses": {
+            "200": {
+              "description": "Successful operation",
+              "content": {
+                "application/json": {
+                  "example": [
+                    {
+                      "id": 1,
+                      "name": "Driver 1"
+                    },
+                    {
+                      "id": 2,
+                      "name": "Driver 2"
+                    }
+                  ]
+                }
+              }
+            }
+          }
+        }
+        // Adicione aqui outras ações da DriverController, se houver
+      },
+      "/passengers": {
+        "get": {
+          "summary": "Get all passengers",
+          "responses": {
+            "200": {
+              "description": "Successful operation",
+              "content": {
+                "application/json": {
+                  "example": [
+                    {
+                      "id": 1,
+                      "name": "Passenger 1"
+                    },
+                    {
+                      "id": 2,
+                      "name": "Passenger 2"
+                    }
+                  ]
+                }
+              }
+            }
+          }
+        }
+        // Adicione aqui outras ações da PassengerController, se houver
+      },
+      "/routes": {
+        "get": {
+          "summary": "Get all routes",
+          "responses": {
+            "200": {
+              "description": "Successful operation",
+              "content": {
+                "application/json": {
+                  "example": [
+                    {
+                      "id": 1,
+                      "name": "Route 1"
+                    },
+                    {
+                      "id": 2,
+                      "name": "Route 2"
+                    }
+                  ]
+                }
+              }
+            }
+          }
+        }
+        // Adicione aqui outras ações da RouteController, se houver
+      },
+      "/trips": {
+        "get": {
+          "summary": "Get all trips",
+          "responses": {
+            "200": {
+              "description": "Successful operation",
+              "content": {
+                "application/json": {
+                  "example": [
+                    {
+                      "id": 1,
+                      "name": "Trip 1"
+                    },
+                    {
+                      "id": 2,
+                      "name": "Trip 2"
+                    }
+                  ]
+                }
+              }
+            }
+          }
+        }
+        // Adicione aqui outras ações da TripController, se houver
+      },
+      "/tripPassengers": {
+        "get": {
+          "summary": "Get all trip passengers",
+          "responses": {
+            "200": {
+              "description": "Successful operation",
+              "content": {
+                "application/json": {
+                  "example": [
+                    {
+                      "id": 1,
+                      "tripId": 1,
+                      "passengerId": 1
+                    },
+                    {
+                      "id": 2,
+                      "tripId": 1,
+                      "passengerId": 2
+                    }
+                  ]
+                }
+              }
+            }
+          }
+        }
+        // Adicione aqui outras ações da TripPassengerController, se houver
+      }
+    }
+  }
+
+

@@ -1,6 +1,7 @@
 using BusControl.API.DataBase.SqlConnection;
-using Microsoft.OpenApi.Models;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.OpenApi.Models;
+using Microsoft.AspNetCore.Builder;
 using Microsoft.Extensions.DependencyInjection;
 
 var builder = WebApplication.CreateBuilder(args);
@@ -11,15 +12,16 @@ builder.Services.AddDbContext<BusControlDBContext>(options => options.UseSqlServ
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen(c =>
 {
-    c.SwaggerDoc("v1", new OpenApiInfo { Title = "BusControl API", Version = "v1" });
+    c.SwaggerDoc("v1", new OpenApiInfo { Title = "BusControl.API", Version = "v1" });
 });
+
 
 var app = builder.Build();
 
 app.UseSwagger();
 app.UseSwaggerUI(c =>
 {
-    c.SwaggerEndpoint("/swagger/v1/swagger.json", "BusControl API v1");
+    c.SwaggerEndpoint("/swagger/v1/swagger.json", "BusControl.API v1");
 });
 
 app.UseRouting();
